@@ -74,12 +74,16 @@ namespace alg2
         public static double[][] MatrixGenerate(int N)
         {
             Random rnd = new Random();
-            double[][] matrix = new double[N, N];
-            for (int i = 0; i < x; i++)
+            double[][] matrix = new double[N][];
+            for (int i = 0; i < N; i++)
             {
-                for (int j = 0; j < x; j++)
+                matrix[i] = new double[N];
+            }
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N; j++)
                 {
-                    matrix[i, j] = rnd.Next(10);
+                    matrix[i][j] = rnd.Next(10);
                 }
             }
             return matrix;
@@ -101,18 +105,16 @@ namespace alg2
             GetData3();
         }
 
-        public static void GetData3()
+        static void GetData3()
         {
-            string PathSelSort = @"..\..\DataSelSort.csv";
-            Stopwatch stopwatch = new Stopwatch();
-            int N = 10;
-            for (int i = 1; i <= N; i++)
+            string Path = @"..\..\DataLU.csv";
+            int N = 300;
+            for (int i = 2; i < N; i++)
             {
-                string Path = @"..\..\DataSelSort.csv";
                 Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Srart();
-                double[][] matrix = LU.MatrixGenerate(N);
-                matrix = LU.MatrixDeterminant(matrix);
+                stopwatch.Start();
+                double[][] matrix = LU.MatrixGenerate(i);
+                double result = LU.MatrixDeterminant(matrix);
                 stopwatch.Stop();
                 string time = (stopwatch.ElapsedTicks).ToString();
                 File.AppendAllText(Path, time + ";");
