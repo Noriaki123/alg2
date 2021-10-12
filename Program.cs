@@ -1,103 +1,123 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Collections.Generic;
 
 namespace alg2
 {
-    class GFG
+    class LU
     {
-        // M is number of applicants
-        // and N is number of jobs
-        static int M = 6;
-        static int N = 6;
-
-        // A DFS based recursive function
-        // that returns true if a matching
-        // for vertex u is possible
-        bool bpm(bool[,] bpGraph, int u,
-                 bool[] seen, int[] matchR)
+        public static double[][] MatrixDecompose(double[][] matrix,
+            out int[] perm, out int toggle)
         {
-            // Try every job one by one
-            for (int v = 0; v < N; v++)
+            // Разложение LUP Дулитла. Предполагается,
+            // что матрица квадратная.
+            int n = matrix.Length; // для удобства
+            double[][] result = MatrixDuplicate(matrix);
+            perm = new int[n];
+            for (int i = 0; i < n; ++i) { perm[i] = i; }
+            toggle = 1;
+            for (int j = 0; j < n - 1; ++j) // каждый столбец
             {
-                // If applicant u is interested
-                // in job v and v is not visited
-                if (bpGraph[u, v] && !seen[v])
+                double colMax = Math.Abs(result[j][j]); // Наибольшее значение в столбце j
+                int pRow = j;
+                for (int i = j + 1; i < n; ++i)
                 {
-                    // Mark v as visited
-                    seen[v] = true;
-
-                    // If job 'v' is not assigned to
-                    // an applicant OR previously assigned
-                    // applicant for job v (which is matchR[v])
-                    // has an alternate job available.
-                    // Since v is marked as visited in the above
-                    // line, matchR[v] in the following recursive
-                    // call will not get job 'v' again
-                    if (matchR[v] < 0 || bpm(bpGraph, matchR[v],
-                                             seen, matchR))
+                    if (result[i][j] > colMax)
                     {
-                        matchR[v] = u;
-                        return true;
+                        colMax = result[i][j];
+                        pRow = i;
                     }
                 }
-            }
-            return false;
-        }
-
-        // Returns maximum number of
-        // matching from M to N
-        int maxBPM(bool[,] bpGraph)
-        {
-            // An array to keep track of the
-            // applicants assigned to jobs.
-            // The value of matchR[i] is the
-            // applicant number assigned to job i,
-            // the value -1 indicates nobody is assigned.
-            int[] matchR = new int[N];
-
-            // Initially all jobs are available
-            for (int i = 0; i < N; ++i)
-                matchR[i] = -1;
-
-            // Count of jobs assigned to applicants
-            int result = 0;
-            for (int u = 0; u < M; u++)
-            {
-                // Mark all jobs as not
-                // seen for next applicant.
-                bool[] seen = new bool[N];
-                for (int i = 0; i < N; ++i)
-                    seen[i] = false;
-
-                // Find if the applicant
-                // 'u' can get a job
-                if (bpm(bpGraph, u, seen, matchR))
-                    result++;
-            }
+                if (pRow != j) // перестановка строк
+                {
+                    double[] rowPtr = result[pRow];
+                    result[pRow] = result[j];
+                    result[j] = rowPtr;
+                    int tmp = perm[pRow]; // Меняем информацию о перестановке
+                    perm[pRow] = perm[j];
+                    perm[j] = tmp;
+                    toggle = -toggle; // переключатель перестановки строк
+                }
+                if (Math.Abs(result[j][j]) < 1.0E-20)
+                    return null;
+                for (int i = j + 1; i < n; ++i)
+                {
+                    result[i][j] /= result[j][j];
+                    for (int k = j + 1; k < n; ++k)
+                        result[i][k] -= result[i][j] * result[j][k];
+                }
+            } // основной цикл по столбцу j
             return result;
         }
-        class Program
+        public static double[][] MatrixDuplicate(double[][] matrix)
         {
-            static void Main(string[] args)
+            // Предполагается, что матрица не нулевая
+            double[][] result = MatrixCreate(matrix.Length, matrix[0].Length);
+            for (int i = 0; i < matrix.Length; ++i) // Копирование значений
+                for (int j = 0; j < matrix[i].Length; ++j)
+                    result[i][j] = matrix[i][j];
+            return result;
+        }
+        public static double MatrixDeterminant(double[][] matrix)
+        {
+            int[] perm;
+            int toggle;
+            double[][] lum = MatrixDecompose(matrix, out perm, out toggle);
+            if (lum == null)
+                throw new Exception("Unable to compute MatrixDeterminant");
+            double result = toggle;
+            for (int i = 0; i < lum.Length; ++i)
+                result *= lum[i][i];
+            return result;
+        }
+        public static double[][] MatrixGenerate(int N)
+        {
+            Random rnd = new Random();
+            double[][] matrix = new double[N, N];
+            for (int i = 0; i < x; i++)
             {
-                // Let us create a bpGraph shown
-                // in the above example
-                bool[,] bpGraph = new bool[,]
-                                  {{false, true, true,
-                            false, false, false},
-                           {true, false, false,
-                            true, false, false},
-                           {false, false, true,
-                            false, false, false},
-                           {false, false, true,
-                            true, false, false},
-                           {false, false, false,
-                            false, false, false},
-                           {false, false, false,
-                            false, false, true}};
-                GFG m = new GFG();
-                Console.Write("Maximum number of applicants that can" +
-                                        " get job is " + m.maxBPM(bpGraph));
+                for (int j = 0; j < x; j++)
+                {
+                    matrix[i, j] = rnd.Next(10);
+                }
+            }
+            return matrix;
+        }
+        public static double[][] MatrixCreate(int rows, int cols)
+        {
+            // Создаем матрицу, полностью инициализированную
+            // значениями 0.0. Проверка входных параметров опущена.
+            double[][] result = new double[rows][];
+            for (int i = 0; i < rows; ++i)
+                result[i] = new double[cols]; // автоинициализация в 0.0
+            return result;
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            GetData3();
+        }
+
+        public static void GetData3()
+        {
+            string PathSelSort = @"..\..\DataSelSort.csv";
+            Stopwatch stopwatch = new Stopwatch();
+            int N = 10;
+            for (int i = 1; i <= N; i++)
+            {
+                string Path = @"..\..\DataSelSort.csv";
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Srart();
+                double[][] matrix = LU.MatrixGenerate(N);
+                matrix = LU.MatrixDeterminant(matrix);
+                stopwatch.Stop();
+                string time = (stopwatch.ElapsedTicks).ToString();
+                File.AppendAllText(Path, time + ";");
             }
         }
     }
+    
 }
