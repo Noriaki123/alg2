@@ -101,41 +101,53 @@ namespace alg2
 
     public class HeapSort
     {
-        public void Heapify(int[] arr, int n, int i)
+        public void sort(int[] arr)
+        {
+            int n = arr.Length;
+
+            for (int i = n / 2 - 1; i >= 0; i--)
+                heapify(arr, n, i);
+
+            for (int i = n - 1; i > 0; i--)
+            {
+                int temp = arr[0];
+                arr[0] = arr[i];
+                arr[i] = temp;
+
+                heapify(arr, i, 0);
+            }
+        }
+
+        void heapify(int[] arr, int n, int i)
         {
             int largest = i;
             int l = 2 * i + 1;
             int r = 2 * i + 2;
+
             if (l < n && arr[l] > arr[largest])
-            {
                 largest = l;
-            }
+
             if (r < n && arr[r] > arr[largest])
-            {
                 largest = r;
-            }
+
             if (largest != i)
             {
                 int swap = arr[i];
                 arr[i] = arr[largest];
                 arr[largest] = swap;
+
+                heapify(arr, n, largest);
             }
-            Heapify(arr, n, largest);
         }
-        public void Sort(int[] arr)
+        public int[] ArrGenerate(int n)
         {
-            int n = arr.Length;
-            for (int i = n / 2 - 1; i >= 0; i--)
+            Random rnd = new Random();
+            int[] arr = new int[n];
+            for (int i = 0; i < n; i++)
             {
-                Heapify(arr, n, i);
+                arr[i] = rnd.Next(30);
             }
-            for (int i = n-1; i >= 0; i--)
-            {
-                int temp = arr[0];
-                arr[0] = arr[i];
-                arr[i] = temp;
-                Heapify(arr, i, 0);
-            }
+            return arr;
         }
     }
 
@@ -143,13 +155,7 @@ namespace alg2
     {
         static void Main(string[] args)
         {
-            int[] arr = { 5, 4, 3, 2, 1, 0 };
-            HeapSort s = new HeapSort();
-            s.Sort(arr);
-            for (int i = 0; i < 5; i++)
-            {
-                Console.Write(arr[i]);
-            }
+            GetData4();
         }
 
         static void GetData3()
@@ -162,6 +168,21 @@ namespace alg2
                 stopwatch.Start();
                 double[][] matrix = LU.MatrixGenerate(i);
                 double result = LU.MatrixDeterminant(matrix);
+                stopwatch.Stop();
+                string time = (stopwatch.ElapsedTicks).ToString();
+                File.AppendAllText(Path, time + ";");
+            }
+        }
+        static void GetData4()
+        {
+            string Path = @"..\..\DataHS.csv";
+            int N = 1000;
+            for (int i = 2; i < N; i++)
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                HeapSort s = new HeapSort();
+                s.sort(s.ArrGenerate(i));
                 stopwatch.Stop();
                 string time = (stopwatch.ElapsedTicks).ToString();
                 File.AppendAllText(Path, time + ";");
