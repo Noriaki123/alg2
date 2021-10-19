@@ -239,7 +239,7 @@ namespace alg2
         static void GetData1()
         {
             string Path = @"..\..\DataLP.csv";
-            int N = 15;
+            int N = 12;
             for (int i = 2; i < N; i++)
             {
                 Stopwatch stopwatch = new Stopwatch();
