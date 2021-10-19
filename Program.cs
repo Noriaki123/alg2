@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 
 namespace alg2 {  
-    class Program {  
+     static class Backtracking {  
         static int N;  
         static void printBoard(int[, ] board) {  
             for (int i = 0; i < N; i++) {  
@@ -37,10 +37,9 @@ namespace alg2 {
                 }  
             }  
             return false;  
-        }  
-        static void Main(string[] args) {  
-            
-            static void DoTask2() {
+        }
+
+        public static void DoTask2() {
                 Console.WriteLine("Введите размер поля:");
                 string path2 = @"..\..\Data2.csv";
                 int K = Convert.ToInt32(Console.ReadLine());
@@ -58,8 +57,11 @@ namespace alg2 {
                     File.AppendAllText(path2, time + ";");
                 }
             }
-            
-            DoTask2();
-        }  
-    }  
+    }
+
+    class Program {
+        static void Main(string[] args) {
+            //Backtracking.DoTask2();
+        }
+    }
 }
