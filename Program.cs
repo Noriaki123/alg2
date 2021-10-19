@@ -151,11 +151,59 @@ namespace alg2
         }
     }
 
+    class Laplace
+    {
+        public double[,] GetMinor(double[,] matrix, int row, int column)
+        {
+            double[,] buf = new double[matrix.GetLength(0) - 1, matrix.GetLength(0) - 1];
+            for (int i = 0; i < matrix.GetLength(0); i++)
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if ((i != row) || (j != column))
+                    {
+                        if (i > row && j < column) buf[i - 1, j] = matrix[i, j];
+                        if (i < row && j > column) buf[i, j - 1] = matrix[i, j];
+                        if (i > row && j > column) buf[i - 1, j - 1] = matrix[i, j];
+                        if (i < row && j < column) buf[i, j] = matrix[i, j];
+                    }
+                }
+            return buf;
+        }
+        public double Determ(double[,] matrix)
+        {
+            double det = 0;
+            int Rank = matrix.GetLength(0);
+            if (Rank == 1) det = matrix[0, 0];
+            if (Rank == 2) det = matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0];
+            if (Rank > 2)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    det += Math.Pow(-1, 0 + j) * matrix[0, j] * Determ(GetMinor(matrix, 0, j));
+                }
+            }
+            return det;
+        }
+        public double[,] MatrixGenerate(int n)
+        {
+            Random rnd = new Random();
+            double[,] matr = new double[n,n];
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    matr[i,j] = rnd.Next(10);
+                }
+            }
+            return matr;
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            GetData4();
+            GetData1();
         }
 
         static void GetData3()
@@ -183,6 +231,21 @@ namespace alg2
                 stopwatch.Start();
                 HeapSort s = new HeapSort();
                 s.sort(s.ArrGenerate(i));
+                stopwatch.Stop();
+                string time = (stopwatch.ElapsedTicks).ToString();
+                File.AppendAllText(Path, time + ";");
+            }
+        }
+        static void GetData1()
+        {
+            string Path = @"..\..\DataLP.csv";
+            int N = 15;
+            for (int i = 2; i < N; i++)
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                Laplace l = new Laplace();
+                l.Determ(l.MatrixGenerate(i));
                 stopwatch.Stop();
                 string time = (stopwatch.ElapsedTicks).ToString();
                 File.AppendAllText(Path, time + ";");
